@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
 import { FaCircleCheck } from "react-icons/fa6";
-import { useState } from 'react';
-
+import { useEffect, useState } from 'react';
+import { IoWarning } from "react-icons/io5";
+import { useCookies } from 'react-cookie';
 
 function SignUp() {
     const features = [
@@ -14,6 +15,8 @@ function SignUp() {
         'Notes for creating and sharing editable documents',
         'Screen sharing, virtual backgrounds, breakout rooms, and local recording'
     ];
+    const [cookies, setCookie] = useCookies(['underAge']);
+    const [underAge, setUnderAge] = useState(false);
     const [birthYear, setBirthYear] = useState('');
 
     const handleBirthYear = function(event) {
@@ -26,8 +29,17 @@ function SignUp() {
         const today = new Date();
         const currentYear = today.getFullYear();
         const age = currentYear - parseInt(birthYear);
-        console.log({age})
+        if(age <= 16) {
+            setUnderAge(true);
+            setCookie('underAge', true);
+        }
     }
+
+    useEffect(() => {
+        if(cookies.underAge) {
+            setUnderAge(true)
+        }
+    },[cookies]);
 
     return (
         <div className='flex h-screen justify-center items-center'>
@@ -50,13 +62,22 @@ function SignUp() {
                         </ul>
                     </div>
 
-                    <div className='flex items-center'>
-                        <form onSubmit={handleVerifyAge} className='flex flex-col gap-5'>
-                            <label className='text-center'>Please confirm your birth year. This data will not be stored.</label>
-                            <input value={birthYear} onChange={handleBirthYear} className='border border-black text-md p-3 rounded-md' type='text' placeholder='Birth Year' />
-                            <button disabled={!birthYear} className='p-2 text-md rounded-xl bg-blue text-white disabled:bg-slate-100 disabled:text-slate-500 '>Continue</button>
-                        </form>
-                    </div>
+                    {
+                        underAge ? 
+                        (<div>
+                            <div className='flex justify-center p-8'><IoWarning size={120} className='text-red-700' /></div>
+                            <p className='text-2xl font-bold text-center'>Sorry, you cannot sign up for Zoom at this time.
+                            </p>
+                            </div>) :
+                        (<div className='flex items-center'>
+                            <form onSubmit={handleVerifyAge} className='flex flex-col gap-5'>
+                                <label className='text-center'>Please confirm your birth year. This data will not be stored.</label>
+                                <input value={birthYear} onChange={handleBirthYear} className='border border-black text-md p-3 rounded-md' type='text' placeholder='Birth Year' />
+                                <button disabled={!birthYear} className='p-2 text-md rounded-xl bg-blue text-white disabled:bg-slate-100 disabled:text-slate-500 '>Continue</button>
+                            </form>
+                        </div>)
+                    }
+                    
                 </div>
             </div>
             <div className='fixed bottom-0 flex justify-between w-1/2 p-4'>
