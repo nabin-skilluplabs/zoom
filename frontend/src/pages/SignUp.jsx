@@ -1,10 +1,12 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaCircleCheck } from "react-icons/fa6";
 import { useEffect, useState } from 'react';
 import { IoWarning } from "react-icons/io5";
 import { useCookies } from 'react-cookie';
 
+
 function SignUp() {
+    const navigate = useNavigate();
     const features = [
         'Unlimited meetings for up to 40 minutes and 100 participants each',
         'Automated captions to help make meetings more inclusive',
@@ -32,6 +34,9 @@ function SignUp() {
         if(age <= 16) {
             setUnderAge(true);
             setCookie('underAge', true);
+        }
+        else {
+            navigate(`/sign-up/email?birthYear=${birthYear}`);
         }
     }
 
@@ -82,7 +87,7 @@ function SignUp() {
             </div>
             <div className='fixed bottom-0 flex justify-between w-1/2 p-4'>
                 <Link to="/">Back</Link>
-                <p>Already have an account? <Link to="">Sign In</Link></p>
+                <p>Already have an account? <Link to="/sign-in">Sign In</Link></p>
             </div>
         </div>
     )
