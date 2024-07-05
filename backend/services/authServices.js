@@ -9,12 +9,11 @@ export async function createSignUpVerification(email) {
     const code = String(random.int(1000000, 9999999));
     const now = new Date();
     const expiryAt = date.addMinutes(now, 10);
-    await prisma.signUpVerification.create({
+    return await prisma.signUpVerification.create({
         data: {
             email,
             code,
             expiryAt
         }
     });
-    // send email with code sendgrid
 }
