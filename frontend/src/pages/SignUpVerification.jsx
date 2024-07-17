@@ -1,14 +1,19 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { FaCircleCheck } from "react-icons/fa6";
 
 import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
-import { validationSchema } from '../validationSchemas/getStarted';
-import { signUpCheckEmail } from '../actions/signUp';
+import { validationSchema } from '../validationSchemas/signupVerification';
+import {  signUpVerifyCode } from '../actions/signUp';
+import { useState } from 'react';
 
 
-function GetStarted() {
+function SignUpVerification() {
     const navigate = useNavigate();
+    let [searchParams] = useSearchParams();
+    const email = searchParams.get('email');
+    const [otpError, setOtpError] = useState('');
+
     const features = [
         'Unlimited meetings for up to 40 minutes and 100 participants each',
         'Automated captions to help make meetings more inclusive',
@@ -29,9 +34,20 @@ function GetStarted() {
         resolver: yupResolver(validationSchema),
       });
 
-    async function handleEmail(data) {
-        await signUpCheckEmail(data);
-        navigate(`/sign-up/verification?email=${data.email}`);
+    async function handleCode(data) {
+        setOtpError('');
+        const response = await signUpVerifyCode({
+            ...data,
+            email,
+        });
+        const body = await response.json();
+        if(response.status === 400) {
+            
+            setOtpError(body);
+        }
+        else if(response.status === 200) {
+            navigate(`/sign-up/activate?email=${email}&id=${body.id}`)
+        }
     }
 
     return (
@@ -56,11 +72,18 @@ function GetStarted() {
                     </div>
 
                     <div className='flex flex-col  items-center'>
-                        <h2 className='text-center text-3xl mb-8 font-bold'>Let's Get Started</h2>
-                        <form onSubmit={handleSubmit(handleEmail)} className='flex flex-col gap-5'>
-                            <input {...register('email')} className='border border-black text-md p-3 rounded-md' type='text' placeholder='Email Address' />
-                            {errors.email?.message && <span className='text-sm text-red-600'>{errors.email.message}</span>}
-                            <button disabled={!watch('email')} className='p-2 text-md rounded-xl bg-blue text-white disabled:bg-slate-100 disabled:text-slate-500 '>Continue</button>
+                        <h2 className='text-center text-3xl mb-8 font-bold'>Check Your Email For A Code
+                        </h2>
+                        <p className='text-md my-4'>Please enter the verification code sent to your email address <strong>{email}</strong>
+
+</p>
+                        {
+                            otpError && (<p className='text-sm text-red-600 my-4'>{otpError}</p>)
+                        }
+                        <form onSubmit={handleSubmit(handleCode)} className='flex flex-col gap-5'>
+                            <input {...register('code')} className='border border-black text-md p-3 rounded-md' type='text' placeholder='Verification code' />
+                            {errors.code?.message && <span className='text-sm text-red-600'>{errors.code.message}</span>}
+                            <button disabled={!watch('code')}  className='p-2 text-md rounded-xl bg-blue text-white disabled:bg-slate-100 disabled:text-slate-500 '>Continue</button>
                             <p>By proceeding, I agree to <Link to="#">Zoom's Privacy Statement</Link> and <Link to="#">Terms of Service</Link>.</p>
                         </form>
                     </div>
@@ -74,4 +97,4 @@ function GetStarted() {
         </div>
     )
 }
-export default GetStarted;
+export default SignUpVerification;
