@@ -56,19 +56,19 @@ function GetStarted() {
                     </div>
 
                     <div className='flex flex-col  items-center'>
-                        <h2 className='text-center text-3xl mb-8 font-bold'>Let's Get Started</h2>
+                        <h2 className='text-center text-3xl mb-8 font-bold'>Let&apos;s Get Started</h2>
                         <form onSubmit={handleSubmit(handleEmail)} className='flex flex-col gap-5'>
                             <input {...register('email')} className='border border-black text-md p-3 rounded-md' type='text' placeholder='Email Address' />
                             {errors.email?.message && <span className='text-sm text-red-600'>{errors.email.message}</span>}
                             <button disabled={!watch('email')} className='p-2 text-md rounded-xl bg-blue text-white disabled:bg-slate-100 disabled:text-slate-500 '>Continue</button>
-                            <p>By proceeding, I agree to <Link to="#">Zoom's Privacy Statement</Link> and <Link to="#">Terms of Service</Link>.</p>
+                            <p>By proceeding, I agree to <Link to="#">Zoom&apos;s Privacy Statement</Link> and <Link to="#">Terms of Service</Link>.</p>
                         </form>
                     </div>
                     
                 </div>
             </div>
             <div className='fixed bottom-0 flex justify-between w-1/2 p-4'>
-                <Link to="/sign-up">Back</Link>
+                <Link to="/sign-up/email">Back</Link>
                 <p>Already have an account? <Link to="/sign-in">Sign In</Link></p>
             </div>
         </div>
